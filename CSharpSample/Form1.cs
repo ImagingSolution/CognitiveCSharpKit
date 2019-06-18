@@ -56,7 +56,6 @@ namespace CSharpSample
                     .Dense(40)
                     .Sigmoid()
                     .Dense(numOfCategories)
-                    .Sigmoid()
                 ;
 
             // ラベルデータの確保(出力と同じサイズ)
@@ -116,7 +115,7 @@ namespace CSharpSample
 #pragma warning disable 618
                     trainer.TrainMinibatch(new Dictionary<Variable, Value>() {
                     { (Variable)inputData, imageBatch },
-                        { (Variable)labelData, labelBatch } }, Utilities.GetDevice());
+                        { (Variable)labelData, labelBatch } }, Layers.GetDevice());
 #pragma warning restore 618
                     //PrintTrainingProgress(trainer, minibatchCount, 1);
 

@@ -16,7 +16,7 @@ namespace CognitiveCSharpKit
 
         public Evaluate(string modelFilename)
         {
-            _function = Function.Load(modelFilename, Utilities._device);
+            _function = Function.Load(modelFilename, Layers._device);
 
             _inputVar = _function.Arguments.Single();
 
@@ -24,7 +24,7 @@ namespace CognitiveCSharpKit
 
         public Evaluate(byte[] modelBuf)
         {
-            _function = Function.Load(modelBuf, Utilities._device);
+            _function = Function.Load(modelBuf, Layers._device);
 
             _inputVar = _function.Arguments.Single();
         }
@@ -60,7 +60,7 @@ namespace CognitiveCSharpKit
             float[] resizedCHW = Data.LoadBitmap(imageFilename, this.ImageWidth, this.ImageHeight, out channel);
 
             var inputDataMap = new Dictionary<Variable, Value>();
-            var inputVal = Value.CreateBatch(new int[] { this.ImageWidth, this.ImageHeight, channel }, resizedCHW, Utilities._device);
+            var inputVal = Value.CreateBatch(new int[] { this.ImageWidth, this.ImageHeight, channel }, resizedCHW, Layers._device);
             inputDataMap.Add(_inputVar, inputVal);
 
             Variable outputVar = _function.Output;
@@ -68,7 +68,7 @@ namespace CognitiveCSharpKit
             var outputDataMap = new Dictionary<Variable, Value>();
             outputDataMap.Add(outputVar, null);
 
-            _function.Evaluate(inputDataMap, outputDataMap, Utilities._device);
+            _function.Evaluate(inputDataMap, outputDataMap, Layers._device);
 
             // Get evaluate result as dense output
             var outputVal = outputDataMap[outputVar];

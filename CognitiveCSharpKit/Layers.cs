@@ -19,18 +19,22 @@ namespace CognitiveCSharpKit
         /// <summary>
         /// CPU or GPU の自動選択（GPU優先）
         /// </summary>
-        public static void SetDevice()
+        public static CNTK.DeviceDescriptor GetDevice()
         {
             foreach (var gpuDevice in CNTK.DeviceDescriptor.AllDevices())
             {
                 if (gpuDevice.Type == CNTK.DeviceKind.GPU)
                 {
                     _device = gpuDevice;
-                    return;
+                    return _device;
                 }
             }
             _device = CNTK.DeviceDescriptor.CPUDevice;
+
+            return _device;
         }
+
+
 
         /// <summary>
         /// ニューラルネットワークモデルの入力設定
@@ -46,7 +50,7 @@ namespace CognitiveCSharpKit
             if (device == null)
             {
                 // CPU or GPUの設定（GPU優先）
-                SetDevice();
+                GetDevice();
             }
             else
             {
@@ -91,14 +95,14 @@ namespace CognitiveCSharpKit
                     CNTK.CNTKLib.SentinelValueForInferParamInitRank,
                     1),
                 //CNTK.CNTKLib.XavierInitializer(),
-                Utilities._device,
+                _device,
                 name + "_w"
                 );
 
             // input * weightParam + biasParam
             if (withBias == true)
             {
-                var biasParam = new Parameter(new int[] { outputDim }, DataType.Float, 0, Utilities._device, name + "_b");
+                var biasParam = new Parameter(new int[] { outputDim }, DataType.Float, 0, _device, name + "_b");
                 return CNTKLib.Plus(CNTKLib.Times(weightParam, input, name + "_times"), biasParam, name);
             }
             else
@@ -135,7 +139,7 @@ namespace CognitiveCSharpKit
                 new int[] { kernelWidth, kernelHeight, numInputChannels, outFeatureMapCount },
                 DataType.Float,
                 CNTKLib.GlorotUniformInitializer(convWScale, -1, 2),
-                Utilities._device
+                _device
                 );
 
             return CNTKLib.Convolution(convParams, input, new int[] { strideX, strideY, numInputChannels } /* strides */);

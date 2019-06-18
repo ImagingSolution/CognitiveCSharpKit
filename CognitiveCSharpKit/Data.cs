@@ -290,7 +290,7 @@ namespace CognitiveCSharpKit
 
             if (value != null)
             {
-                inputValue = CNTK.Value.CreateBatch<float>(new int[] { variable.Shape.Dimensions[0] }, value, 0, value.Length, Utilities._device);
+                inputValue = CNTK.Value.CreateBatch<float>(new int[] { variable.Shape.Dimensions[0] }, value, 0, value.Length, Layers._device);
             }
             return new Dictionary<CNTK.Variable, CNTK.Value>() { { variable, inputValue } };
         }
@@ -371,8 +371,8 @@ namespace CognitiveCSharpKit
                 }
             }
 
-            imageBatch = Value.CreateBatch<float>(new int[] { width, height, channel }, batchImageBuf, Utilities._device);
-            labelBatch = Value.CreateBatch<float>(new int[] { numClasses }, batchLabelBuf, Utilities._device);
+            imageBatch = Value.CreateBatch<float>(new int[] { width, height, channel }, batchImageBuf, Layers._device);
+            labelBatch = Value.CreateBatch<float>(new int[] { numClasses }, batchLabelBuf, Layers._device);
             return true;
         }
 
