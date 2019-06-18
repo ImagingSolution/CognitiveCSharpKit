@@ -5,16 +5,22 @@ VisualStudioVersion = 15.0.28307.645
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CognitiveCSharpKit", "CognitiveCSharpKit\CognitiveCSharpKit.csproj", "{45103990-607D-479D-9395-06B05BC9700A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CSharpSample", "CSharpSample\CSharpSample.csproj", "{D4AFE06F-E6E6-47BB-B20D-7386CD193A4C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{45103990-607D-479D-9395-06B05BC9700A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{45103990-607D-479D-9395-06B05BC9700A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{45103990-607D-479D-9395-06B05BC9700A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{45103990-607D-479D-9395-06B05BC9700A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45103990-607D-479D-9395-06B05BC9700A}.Debug|x64.ActiveCfg = Debug|x64
+		{45103990-607D-479D-9395-06B05BC9700A}.Debug|x64.Build.0 = Debug|x64
+		{45103990-607D-479D-9395-06B05BC9700A}.Release|x64.ActiveCfg = Release|x64
+		{45103990-607D-479D-9395-06B05BC9700A}.Release|x64.Build.0 = Release|x64
+		{D4AFE06F-E6E6-47BB-B20D-7386CD193A4C}.Debug|x64.ActiveCfg = Debug|x64
+		{D4AFE06F-E6E6-47BB-B20D-7386CD193A4C}.Debug|x64.Build.0 = Debug|x64
+		{D4AFE06F-E6E6-47BB-B20D-7386CD193A4C}.Release|x64.ActiveCfg = Release|x64
+		{D4AFE06F-E6E6-47BB-B20D-7386CD193A4C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
