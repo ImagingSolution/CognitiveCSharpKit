@@ -77,9 +77,6 @@ namespace CognitiveCSharpKit
 
                 // リサイズ後画像のフォーマット
                 System.Windows.Media.PixelFormat resizedFormat = scaledBitmapSource.Format;
-
-                Array arrResized;
-
             }
 
 
@@ -205,14 +202,15 @@ namespace CognitiveCSharpKit
         /// <param name="dstWidth">リサイズ後の画像の幅</param>
         /// <param name="dstHeight">リサイズ後の画像の高さ</param>
         /// <param name="channel">画像のチャンネル数</param>
-        /// <param name="numOfCategories">カテゴリ数（指定フォルダ内のフォルダ数）</param>
+        /// <param name="categories">指定フォルダ内のフォルダ名の配列</param>
         /// <returns>ファイルパス、ラベル番号、画像データのTupleのリスト</returns>
         public static List<Tuple<string, int, float[]>> PrepareTrainingDataFromSubfolders(
             string rootFolderOfClassifiedImages,
             int dstWidth,
             int dstHeight,
             out int channel,
-            out int numOfCategories
+            //out int numOfCategories
+            out string[] categories
             )
         {
             channel = 0;
@@ -221,10 +219,10 @@ namespace CognitiveCSharpKit
             List<Tuple<string, int, float[]>> dataMap = new List<Tuple<string, int, float[]>>();
 
             // 指定フォルダ内のフォルダ（カテゴリに分けられたフォルダ）一覧の取得
-            string[] categories = System.IO.Directory.GetDirectories(
+            categories = System.IO.Directory.GetDirectories(
                 rootFolderOfClassifiedImages, "*", System.IO.SearchOption.TopDirectoryOnly);
 
-            numOfCategories = categories.Length;
+            //numOfCategories = categories.Length;
 
             int categoryIndex = 0;
             foreach (var category in categories)
@@ -251,6 +249,12 @@ namespace CognitiveCSharpKit
                 categoryIndex++;
             }
 
+            // カテゴリの配列をフォルダ名のみに変更
+            for (int i = 0; i < categories.Length; i++)
+            {
+                categories[i] = System.IO.Path.GetFileName(categories[i]);
+            }
+
             return dataMap;
         }
 
@@ -265,14 +269,10 @@ namespace CognitiveCSharpKit
         {
             float[] chwData = null;
 
-            //using (Bitmap bmp = new Bitmap((Bitmap)Bitmap.FromFile(filePath)))
             using (FileStream fs = File.OpenRead(filePath))
             using (Bitmap bmp = (Bitmap)Bitmap.FromStream(fs, false, false))
-            //using (Bitmap bmp = (Bitmap)Bitmap.FromFile(filePath, true))
-            //using (Bitmap bmp = new Bitmap(filePath))
-            //using (Bitmap bmp = (Bitmap)Image.FromFile(filePath, true))
             {
-                ResizeBitmapExtractCHW(bmp, dstWidth, dstHeight, out channel, ref chwData);
+                ResizeBitmapExtractCHW(bmp, dstWidth, dstHeight, out channel, ref chwData, false);
             }
             return chwData;
         }

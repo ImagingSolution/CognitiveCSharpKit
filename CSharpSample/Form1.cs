@@ -25,7 +25,8 @@ namespace CSharpSample
             // Chart領域の初期化
             Utilities.InitChart(chtTraining);
 
-            //LogisticRegression.TrainAndEvaluate(DeviceDescriptor.CPUDevice, chtTraining);
+            /////////////////////////////////////////////////////////////////////////////
+            // 学習用画像
 
             int dstWidth = 28;
             int dstHeight = 28;
@@ -33,19 +34,21 @@ namespace CSharpSample
 
             // 学習用データの取得
             int numOfCategories;
+            string[] categories;
 
             var trainingDataMap = Data.PrepareTrainingDataFromSubfolders(
                 @"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\test",   // 画像データが格納されたフォルダ
-                dstWidth, // リサイズ後の幅
-                dstHeight,　// リサイズ後の高さ
-                out srcChannel,
-                out numOfCategories
+                dstWidth,       // リサイズ後の幅
+                dstHeight,　    // リサイズ後の高さ
+                out srcChannel, // 画像のチャンネル数
+                out categories  // 指定フォルダ内にカテゴリ別に分けられたフォルダ名の配列
                 );
+
+            // クラス数
+            numOfCategories = categories.Length;
 
             /////////////////////////////////////////////////////////////////////////////
             // ニューラルネットワークモデルの構築
-
-            // デバイス
 
             // 入力サイズ28x28
             var inputData = Layers.Input(dstWidth, dstHeight, srcChannel);
@@ -53,49 +56,58 @@ namespace CSharpSample
             // ネットワークの構築
             var model =
                 inputData
-                    .Dense(40)
-                    .Sigmoid()
+                    .Scale(0.003125f)   // 1/256
+
+                    .Convolution(
+                        3, 3,   // kernelSize
+                        4,      // kernel数
+                        1, 1    // stride
+                        )
+                    .ReLU()
+                    .MaxPooling(
+                        3, 3,   // Poolingのサイズ
+                        2, 2,   // stride 
+                        true    // paddingするか？
+                        )
+
+                    .Convolution(
+                        3, 3,   // kernelSize
+                        8,      // kernel数
+                        1, 1    // stride
+                        )
+                    .ReLU()
+                    .MaxPooling(
+                        3, 3,   // Poolingのサイズ
+                        2, 2,   // stride 
+                        true    // paddingするか？
+                        )
+
                     .Dense(numOfCategories)
                 ;
 
+            /////////////////////////////////////////////////////////////////////////////
+            
             // ラベルデータの確保(出力と同じサイズ)
             var labelData = model.LabelData();
-
-            // 誤差関数
-            Function trainingLoss = CNTKLib.CrossEntropyWithSoftmax(model, labelData);
+            // 損失関数
+            Function trainingLoss = CNTKLib.CrossEntropyWithSoftmax(model, labelData);  // Softmax → CrossEntropy
             //Function trainingLoss = CNTKLib.BinaryCrossEntropy(model, labelData);
             // 分類誤差
             Function predictionError = CNTKLib.ClassificationError(model, labelData);
 
             /////////////////////////////////////////////////////////////////////////////
-            // 学習器の構築
+            // 学習
 
-            int numMinibatches = 10;// 5;
-            float learningRatePerMinibatch = 0.2F;
-            float learningmomentumPerMinibatch = 0.9F;
-            float l2RegularizationWeight = 0.1F;
-
-            // 学習パラメータの設定
-            //AdditionalLearningOptions additionalLearningOptions =
-            //    new AdditionalLearningOptions() { l2RegularizationWeight = l2RegularizationWeight };
-            //IList<Learner> parameterLearners = new List<Learner>() {
-            //        Learner.MomentumSGDLearner(model.Parameters(),
-            //        new TrainingParameterScheduleDouble(learningRatePerMinibatch, 0),
-            //        new TrainingParameterScheduleDouble(learningmomentumPerMinibatch, 0),
-            //        true,
-            //        additionalLearningOptions)};
-            //// 学習器の作成
-            //var trainer = Trainer.CreateTrainer(model, trainingLoss, predictionError, parameterLearners);
+            int numMinibatches = 10;
 
             // 学習率
-            CNTK.TrainingParameterScheduleDouble learningRatePerSample = new CNTK.TrainingParameterScheduleDouble(0.02, 1);
+            CNTK.TrainingParameterScheduleDouble learningRatePerSample = new CNTK.TrainingParameterScheduleDouble(0.003125, 1);//(0.02, 1);
             // 確率的勾配降下法（Stochastic Gradient Descent）の適応
             var list = model.Parameters();
             IList<Learner> parameterLearners =
                 new List<Learner>() { Learner.SGDLearner(model.Parameters(), learningRatePerSample) };
             // 学習の構築
             var trainer = Trainer.CreateTrainer(model, trainingLoss, predictionError, parameterLearners);
-
 
             int updatePerMinibatches = numMinibatches / 10;
             if (updatePerMinibatches == 0) updatePerMinibatches = 1;
@@ -124,25 +136,30 @@ namespace CSharpSample
                 Utilities.DrawTrainingProgress(trainer, minibatchCount, updatePerMinibatches, chtTraining);
             }
 
-            var arr = model.Save();
-            //model.Save("SaveModeTest.model");
+            ////////////////////////////////////////////////////////
+            // 学習結果の保存、読み出し
+            // 本プログラム的には意味はないが、学習と推論を切り分けるためのサンプル
 
-            Evaluate eva = new Evaluate(arr);
+            var modelFilename = "cntk_cnn.model";
+            // モデルの保存
+            model.Save(modelFilename);
 
-            var sw = new System.Diagnostics.Stopwatch();
-            sw.Start();
+            // モデルの読み出し
+            // Softmax()は学習時のモデルには含まれていないため追加（CrossEntropyに含まれているため）
+            Function loadModel = Layers.LoadModel(modelFilename).Softmax();
 
-            var val = eva.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\9\7.png");
-            Console.WriteLine($"9, {val}");
-            val = eva.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\9\125.png");
-            Console.WriteLine($"4, {val}");
-            val = eva.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\5\120.png");
-            Console.WriteLine($"9, {val}");
-            val = eva.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\8\233.png");
-            Console.WriteLine($"4, {val}");
+            ////////////////////////////////////////////////////////
+            // 画像データの評価(推論)
 
-            sw.Stop();
-            Console.WriteLine($"time = {sw.ElapsedMilliseconds}");
+            var val = loadModel.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\2\186.png");
+            Console.WriteLine($"{categories[0]}:{val[0]}, {categories[1]}:{val[1]}, {categories[2]}:{val[2]}, {categories[3]}:{val[3]}");
+            val = loadModel.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\4\109.png");
+            Console.WriteLine($"{categories[0]}:{val[0]}, {categories[1]}:{val[1]}, {categories[2]}:{val[2]}, {categories[3]}:{val[3]}");
+            val = loadModel.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\8\299.png");
+            Console.WriteLine($"{categories[0]}:{val[0]}, {categories[1]}:{val[1]}, {categories[2]}:{val[2]}, {categories[3]}:{val[3]}");
+            val = loadModel.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\9\118.png");
+            Console.WriteLine($"{categories[0]}:{val[0]}, {categories[1]}:{val[1]}, {categories[2]}:{val[2]}, {categories[3]}:{val[3]}");
+
         }
     }
 }

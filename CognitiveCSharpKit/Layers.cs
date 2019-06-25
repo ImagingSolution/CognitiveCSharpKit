@@ -111,6 +111,13 @@ namespace CognitiveCSharpKit
             }
         }
 
+        public static Function Scale(this Function function, float scale, string name = "")
+        {
+
+            return CNTKLib.ElementTimes(Constant.Scalar<float>(scale, _device), function);
+        }
+
+
         /// <summary>
         /// コンボリューション
         /// </summary>
@@ -154,15 +161,14 @@ namespace CognitiveCSharpKit
         /// <param name="hStride"></param>
         /// <param name="vStride"></param>
         /// <returns></returns>
-        public static Function MaxPooling(this Function function, int poolingWindowWidth, int poolingWindowHeight, int hStride, int vStride)
+        public static Function MaxPooling(this Function function, int poolingWindowWidth, int poolingWindowHeight, int hStride, int vStride, bool padding)
         {
-
             return CNTKLib.Pooling(
                 function,
                 PoolingType.Max,
                 new int[] { poolingWindowWidth, poolingWindowHeight },
                 new int[] { hStride, vStride },
-                new bool[] { true }
+                new bool[] { padding }
                 );
         }
 
@@ -175,17 +181,32 @@ namespace CognitiveCSharpKit
         /// <param name="hStride"></param>
         /// <param name="vStride"></param>
         /// <returns></returns>
-        public static Function AveragePooling(this Function function, int poolingWindowWidth, int poolingWindowHeight, int hStride, int vStride)
+        public static Function AveragePooling(this Function function, int poolingWindowWidth, int poolingWindowHeight, int hStride, int vStride, bool padding)
         {
-
             return CNTKLib.Pooling(
                 function,
                 PoolingType.Average,
                 new int[] { poolingWindowWidth, poolingWindowHeight },
                 new int[] { hStride, vStride },
-                new bool[] { true }
+                new bool[] { padding }
                 );
         }
+
+        //public static Function BatchNormalization(this Function function, int poolingWindowWidth, int poolingWindowHeight, int hStride, int vStride)
+        //{
+
+        //    return CNTKLib.BatchNormalization(
+        //        function,
+        //        PoolingType.Average,
+        //        new int[] { poolingWindowWidth, poolingWindowHeight },
+        //        new int[] { hStride, vStride },
+        //        new bool[] { true }
+        //        );
+        //}
+
+
+
+
 
 
     }
