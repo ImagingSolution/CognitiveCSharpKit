@@ -192,17 +192,17 @@ namespace CognitiveCSharpKit
                 );
         }
 
-        //public static Function BatchNormalization(this Function function, int poolingWindowWidth, int poolingWindowHeight, int hStride, int vStride)
-        //{
+        public static Function BatchNormalization(this Function function, float sigmaScale, float offset, int timeConst = 0, bool spatial = true, string name = "")
+        {
+            var biasParams = new Parameter(new int[] { NDShape.InferredDimension }, offset, _device, name + "_bias");
+            var scaleParams = new Parameter(new int[] { NDShape.InferredDimension }, sigmaScale, _device, name + "_sigmaScale");
+            var runningMean = new Constant(new int[] { NDShape.InferredDimension }, 0.0f, _device);
+            var runningInvStd = new Constant(new int[] { NDShape.InferredDimension }, 0.0f, _device);
+            var runningCount = Constant.Scalar(0.0f, _device);
 
-        //    return CNTKLib.BatchNormalization(
-        //        function,
-        //        PoolingType.Average,
-        //        new int[] { poolingWindowWidth, poolingWindowHeight },
-        //        new int[] { hStride, vStride },
-        //        new bool[] { true }
-        //        );
-        //}
+            return CNTKLib.BatchNormalization(function, scaleParams, biasParams, runningMean, runningInvStd, runningCount,
+                spatial, (double)timeConst, 0.0, 1e-5 /* epsilon */);
+        }
 
 
 

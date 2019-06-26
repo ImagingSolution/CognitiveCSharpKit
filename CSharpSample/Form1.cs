@@ -36,6 +36,7 @@ namespace CSharpSample
             int numOfCategories;
             string[] categories;
 
+            // 学習用データセット　List<Tuple<string, int, float[]>>　<ファイル名、カテゴリIndex 0, 1, 2...、画像データ配列 CHW順の一次元>
             var trainingDataMap = Data.PrepareTrainingDataFromSubfolders(
                 @"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\test",   // 画像データが格納されたフォルダ
                 dstWidth,       // リサイズ後の幅
@@ -56,29 +57,30 @@ namespace CSharpSample
             // ネットワークの構築
             var model =
                 inputData
-                    .Scale(0.003125f)   // 1/256
+                    //.Scale(0.003125f)   // 1/256
+                    .BatchNormalization(0.5f, 0f)   // ±２σが±１になるぐらいを想定
 
                     .Convolution(
-                        3, 3,   // kernelSize
+                        3, 3,   // kernelSize 幅、高さ
                         4,      // kernel数
-                        1, 1    // stride
+                        1, 1    // stride　横、縦
                         )
                     .ReLU()
                     .MaxPooling(
-                        3, 3,   // Poolingのサイズ
-                        2, 2,   // stride 
+                        3, 3,   // Poolingのサイズ 幅、高さ
+                        2, 2,   // stride 横、縦
                         true    // paddingするか？
                         )
 
                     .Convolution(
-                        3, 3,   // kernelSize
+                        3, 3,   // kernelSize 幅、高さ
                         8,      // kernel数
-                        1, 1    // stride
+                        1, 1    // stride　横、縦
                         )
                     .ReLU()
                     .MaxPooling(
-                        3, 3,   // Poolingのサイズ
-                        2, 2,   // stride 
+                        3, 3,   // Poolingのサイズ 幅、高さ
+                        2, 2,   // stride　横、縦 
                         true    // paddingするか？
                         )
 
@@ -91,7 +93,7 @@ namespace CSharpSample
             var labelData = model.LabelData();
             // 損失関数
             Function trainingLoss = CNTKLib.CrossEntropyWithSoftmax(model, labelData);  // Softmax → CrossEntropy
-            //Function trainingLoss = CNTKLib.BinaryCrossEntropy(model, labelData);
+            //Function trainingLoss = CNTKLib.BinaryCrossEntropy(model, labelData); // 出力が１つの場合
             // 分類誤差
             Function predictionError = CNTKLib.ClassificationError(model, labelData);
 
