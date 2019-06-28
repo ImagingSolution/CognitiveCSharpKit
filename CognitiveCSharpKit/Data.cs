@@ -272,7 +272,7 @@ namespace CognitiveCSharpKit
             using (FileStream fs = File.OpenRead(filePath))
             using (Bitmap bmp = (Bitmap)Bitmap.FromStream(fs, false, false))
             {
-                ResizeBitmapExtractCHW(bmp, dstWidth, dstHeight, out channel, ref chwData, false);
+                ResizeBitmapExtractCHW(bmp, dstWidth, dstHeight, out channel, ref chwData);
             }
             return chwData;
         }
@@ -282,7 +282,6 @@ namespace CognitiveCSharpKit
             int channel;
             return LoadBitmap(filePath, dstWidth, dstHeight, out channel);
         }
-
 
         public static Dictionary<CNTK.Variable, CNTK.Value> SetVariableValue(CNTK.Variable variable, float[] value)
         {
@@ -371,6 +370,7 @@ namespace CognitiveCSharpKit
                 }
             }
 
+            // Value.CreateBatch<byte>がいけるかも？？
             imageBatch = Value.CreateBatch<float>(new int[] { width, height, channel }, batchImageBuf, Layers._device);
             labelBatch = Value.CreateBatch<float>(new int[] { numClasses }, batchLabelBuf, Layers._device);
             return true;

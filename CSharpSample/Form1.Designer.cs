@@ -32,8 +32,9 @@
             System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.btnLogisticRegression = new System.Windows.Forms.Button();
             this.chtTraining = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.btnLogisticRegression = new System.Windows.Forms.Button();
+            this.btnEvaluation = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
@@ -54,20 +55,11 @@
             // 
             // splitContainer1.Panel2
             // 
+            this.splitContainer1.Panel2.Controls.Add(this.btnEvaluation);
             this.splitContainer1.Panel2.Controls.Add(this.btnLogisticRegression);
             this.splitContainer1.Size = new System.Drawing.Size(699, 483);
             this.splitContainer1.SplitterDistance = 538;
             this.splitContainer1.TabIndex = 0;
-            // 
-            // btnLogisticRegression
-            // 
-            this.btnLogisticRegression.Location = new System.Drawing.Point(8, 3);
-            this.btnLogisticRegression.Name = "btnLogisticRegression";
-            this.btnLogisticRegression.Size = new System.Drawing.Size(145, 35);
-            this.btnLogisticRegression.TabIndex = 0;
-            this.btnLogisticRegression.Text = "LogisticRegression";
-            this.btnLogisticRegression.UseVisualStyleBackColor = true;
-            this.btnLogisticRegression.Click += new System.EventHandler(this.btnLogisticRegression_Click);
             // 
             // chtTraining
             // 
@@ -85,6 +77,26 @@
             this.chtTraining.Size = new System.Drawing.Size(538, 483);
             this.chtTraining.TabIndex = 0;
             this.chtTraining.Text = "chart1";
+            // 
+            // btnLogisticRegression
+            // 
+            this.btnLogisticRegression.Location = new System.Drawing.Point(8, 3);
+            this.btnLogisticRegression.Name = "btnLogisticRegression";
+            this.btnLogisticRegression.Size = new System.Drawing.Size(145, 35);
+            this.btnLogisticRegression.TabIndex = 0;
+            this.btnLogisticRegression.Text = "LogisticRegression";
+            this.btnLogisticRegression.UseVisualStyleBackColor = true;
+            this.btnLogisticRegression.Click += new System.EventHandler(this.btnLogisticRegression_Click);
+            // 
+            // btnEvaluation
+            // 
+            this.btnEvaluation.Location = new System.Drawing.Point(8, 44);
+            this.btnEvaluation.Name = "btnEvaluation";
+            this.btnEvaluation.Size = new System.Drawing.Size(145, 32);
+            this.btnEvaluation.TabIndex = 1;
+            this.btnEvaluation.Text = "Evaluation";
+            this.btnEvaluation.UseVisualStyleBackColor = true;
+            this.btnEvaluation.Click += new System.EventHandler(this.btnEvaluation_Click);
             // 
             // Form1
             // 
@@ -108,6 +120,7 @@
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.DataVisualization.Charting.Chart chtTraining;
         private System.Windows.Forms.Button btnLogisticRegression;
+        private System.Windows.Forms.Button btnEvaluation;
     }
 }
 

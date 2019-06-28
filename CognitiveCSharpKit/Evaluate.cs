@@ -74,6 +74,38 @@ namespace CognitiveCSharpKit
             int imageHeight = inputVar.Shape[1];
 
             float[] resizedCHW = Data.LoadBitmap(imageFilename, imageWidth, imageHeight, out channel);
+            //byte[] resizedCHW = Data.LoadBitmapByte(imageFilename, imageWidth, imageHeight, out channel);
+
+
+            var inputDataMap = new Dictionary<Variable, Value>();
+            var inputVal = Value.CreateBatch(new int[] { imageWidth, imageHeight, channel }, resizedCHW, Layers._device);
+
+            inputDataMap.Add(inputVar, inputVal);
+
+            Variable outputVar = function.Output;
+
+            var outputDataMap = new Dictionary<Variable, Value>();
+            outputDataMap.Add(outputVar, null);
+
+            function.Evaluate(inputDataMap, outputDataMap, Layers._device);
+
+            // Get evaluate result as dense output
+            var outputVal = outputDataMap[outputVar];
+            var outputData = outputVal.GetDenseData<float>(outputVar);
+
+            return outputData[0].ToArray();
+        }
+
+        public static float[] EvaluateImageByte(this Function function, string imageFilename)
+        {
+            int channel;
+
+            Variable inputVar = function.Arguments.Single();
+
+            int imageWidth = inputVar.Shape[0];
+            int imageHeight = inputVar.Shape[1];
+
+            float[] resizedCHW = Data.LoadBitmap(imageFilename, imageWidth, imageHeight, out channel);
 
             var inputDataMap = new Dictionary<Variable, Value>();
             var inputVal = Value.CreateBatch(new int[] { imageWidth, imageHeight, channel }, resizedCHW, Layers._device);
@@ -92,6 +124,7 @@ namespace CognitiveCSharpKit
 
             return outputData[0].ToArray();
         }
+
 
     }
 }

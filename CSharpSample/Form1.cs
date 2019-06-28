@@ -52,13 +52,13 @@ namespace CSharpSample
             // ニューラルネットワークモデルの構築
 
             // 入力サイズ28x28
-            var inputData = Layers.Input(dstWidth, dstHeight, srcChannel);
+            var inputData = Layers.Input(dstWidth, dstHeight, srcChannel, DataType.Float);
 
             // ネットワークの構築
             var model =
                 inputData
                     //.Scale(0.003125f)   // 1/256
-                    .BatchNormalization(0.5f, 0f)   // ±２σが±１になるぐらいを想定
+                    //.BatchNormalization(0.5f, 0f)   // ±２σが±１になるぐらいを想定
 
                     .Convolution(
                         3, 3,   // kernelSize 幅、高さ
@@ -103,7 +103,7 @@ namespace CSharpSample
             int numMinibatches = 10;
 
             // 学習率
-            CNTK.TrainingParameterScheduleDouble learningRatePerSample = new CNTK.TrainingParameterScheduleDouble(0.003125, 1);//(0.02, 1);
+            CNTK.TrainingParameterScheduleDouble learningRatePerSample = new CNTK.TrainingParameterScheduleDouble(0.0002, 1); //(0.003125, 1);//(0.02, 1);
             // 確率的勾配降下法（Stochastic Gradient Descent）の適応
             var list = model.Parameters();
             IList<Learner> parameterLearners =
@@ -161,6 +161,27 @@ namespace CSharpSample
             Console.WriteLine($"{categories[0]}:{val[0]}, {categories[1]}:{val[1]}, {categories[2]}:{val[2]}, {categories[3]}:{val[3]}");
             val = loadModel.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\9\118.png");
             Console.WriteLine($"{categories[0]}:{val[0]}, {categories[1]}:{val[1]}, {categories[2]}:{val[2]}, {categories[3]}:{val[3]}");
+
+        }
+
+        private void btnEvaluation_Click(object sender, EventArgs e)
+        {
+            var modelFilename = "cntk_cnn.model";
+            // モデルの読み出し
+            // Softmax()は学習時のモデルには含まれていないため追加（CrossEntropyに含まれているため）
+            Function loadModel = Layers.LoadModel(modelFilename).Softmax();
+
+            ////////////////////////////////////////////////////////
+            // 画像データの評価(推論)
+
+            var val = loadModel.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\2\186.png");
+            Console.WriteLine($"{ val[0]}, { val[1]}, { val[2]}, { val[3]}");
+            val = loadModel.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\4\109.png");
+            Console.WriteLine($"{ val[0]}, { val[1]}, { val[2]}, { val[3]}");
+            val = loadModel.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\8\299.png");
+            Console.WriteLine($"{ val[0]}, { val[1]}, { val[2]}, { val[3]}");
+            val = loadModel.EvaluateImage(@"D:\NeuralNetworkConsole\neural_network_console_140\samples\sample_dataset\MNIST\validation\9\118.png");
+            Console.WriteLine($"{ val[0]}, { val[1]}, { val[2]}, { val[3]}");
 
         }
     }
